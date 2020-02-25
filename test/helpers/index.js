@@ -6,7 +6,7 @@ function runAll (ops) {
     function runNext (op) {
       op(err => {
         if (err) return reject(err)
-        let next = ops.shift()
+        const next = ops.shift()
         if (!next) return resolve()
         return runNext(next)
       })

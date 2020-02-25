@@ -372,6 +372,72 @@ test('caching works correctly when reopening by discovery key', async t => {
   t.end()
 })
 
+test('destroying a store deletes its data', async t => {
+  const store = await create('test-store')
+  const firstCore = store.default()
+  let defaultKey = null
+
+  await runAll([
+    cb => firstCore.append('Hello World', cb),
+    cb => {
+      defaultKey = firstCore.key
+      t.same(firstCore.length, 1, 'core has data')
+      return process.nextTick(cb, null)
+    },
+    cb => store.destroy(cb)
+  ])
+
+  const reopenedStore = await create('test-store')
+  const reopenedCore = reopenedStore.default()
+
+  await runAll([
+    cb => reopenedCore.ready(cb)
+  ])
+
+  t.same(reopenedCore.key, defaultKey, 'regenerated same default core')
+  t.same(reopenedCore.length, 0, 'core is now empty')
+
+  await cleanup(['test-store'])
+  t.end()
+})
+
+test('destroying a namespaced store deletes its data', async t => {
+  const store = await create('test-store')
+  const store2 = store.namespace('store2')
+
+  await store.ready()
+  await store2.ready()
+
+  const firstCore = store2.default()
+  let defaultKey = null
+
+  await runAll([
+    cb => firstCore.append('Hello world', cb),
+    cb => {
+      defaultKey = firstCore.key
+      t.same(firstCore.length, 1, 'core has data')
+      return process.nextTick(cb, null)
+    },
+    cb => store2.destroy(cb)
+  ])
+
+  const reopenedStore = store.namespace('store2')
+
+  await store2.ready()
+
+  const reopenedCore = reopenedStore.default()
+
+  await runAll([
+    cb => reopenedCore.ready(cb)
+  ])
+
+  t.same(reopenedCore.key, defaultKey, 'regenerated same default core')
+  t.same(reopenedCore.length, 0, 'core is now empty')
+
+  await cleanup(['test-store'])
+  t.end()
+})
+
 async function create (storage, opts) {
   const store = new Corestore(storage, opts)
   await store.ready()

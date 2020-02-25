@@ -4,7 +4,8 @@
   "description": "A Hypercore factory that stores and replicates linked cores.",
   "main": "index.js",
   "scripts": {
-    "test": "standard && tape test/*.js"
+    "test": "standard && tape test/*.js",
+    "fix": "standard --fix"
   },
   "repository": {
     "type": "git",
@@ -31,7 +32,7 @@
     "derive-key": "^1.0.0",
     "derived-key-storage": "^2.0.0",
     "fd-lock": "^1.0.2",
-    "hypercore": "^8.0.0",
+    "hypercore": "^8.10.0",
     "hypercore-crypto": "^1.0.0",
     "hypercore-protocol": "^7.6.0",
     "hypertrie": "^4.0.0",
