@@ -449,6 +449,37 @@ test('can check if cores are loaded', async t => {
   t.end()
 })
 
+test('support global onwrite opt', async t => {
+  const store = await create(ram, { onwrite })
+  await store.ready()
+
+  const feed1 = store.default()
+  const feed2 = store.get()
+
+  let nodes = []
+
+  await runAll([
+    cb => feed1.ready(cb),
+    cb => feed2.ready(cb),
+    cb => feed1.append('foo', cb),
+    cb => feed2.append('bar', cb),
+    cb => feed1.append('baz', cb)
+  ])
+
+  t.deepEqual(nodes, [
+    [feed1.key.toString('hex'), 0, 'foo'].join('!'),
+    [feed2.key.toString('hex'), 0, 'bar'].join('!'),
+    [feed1.key.toString('hex'), 1, 'baz'].join('!')
+  ])
+
+  t.end()
+
+  function onwrite (key, index, data, peer, cb) {
+    nodes.push([key.toString('hex'), index, data].join('!'))
+    cb()
+  }
+})
+
 async function create (storage, opts) {
   const store = new Corestore(storage, opts)
   await store.ready()

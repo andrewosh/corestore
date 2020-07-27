@@ -213,6 +213,12 @@ class InnerCorestore extends Nanoresource {
     if (cacheOpts.data) cacheOpts.data = cacheOpts.data.namespace()
     if (cacheOpts.tree) cacheOpts.tree = cacheOpts.tree.namespace()
 
+    if (!coreOpts.onwrite && this.opts.onwrite) {
+      coreOpts.onwrite = function (index, data, peer, cb) {
+        self.opts.onwrite(publicKey, index, data, peer, cb)
+      }
+    }
+
     const core = hypercore(name => {
       if (name === 'key') return keyStorage.key
       if (name === 'secret_key') return keyStorage.secretKey

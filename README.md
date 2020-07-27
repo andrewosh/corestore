@@ -55,6 +55,8 @@ Opts is an optional object which can contain any Hypercore constructor options, 
 ```js
 {
   cacheSize: 1000 // The size of the LRU cache for passively-replicating cores.
+  onwrite: (key, index, data, peer, cb) // set the onwrite option for each hypercore,
+                                        // but the callback gets the feed key as first argument
 }
 ```
 
