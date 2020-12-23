@@ -326,7 +326,10 @@ class Corestore extends Nanoresource {
     this._isNamespaced = !!opts.name
     this._openedCores = new Map()
 
-    const onfeed = feed => this.emit('feed', feed)
+    const onfeed = feed => {
+      this.emit('feed', feed)
+      this._unlisten()
+    }
     const onerror = err => this.emit('error', err)
     this.inner.on('feed', onfeed)
     this.inner.on('error', onerror)
